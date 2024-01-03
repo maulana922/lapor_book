@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lapor_book/components/input_widget.dart';
-import 'package:lapor_book/components/styles.dart';
 import 'package:lapor_book/components/validators.dart';
+import 'package:lapor_book/components/styles.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginPage extends StatefulWidget {
@@ -11,7 +11,6 @@ class LoginPage extends StatefulWidget {
 
 class LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-
   final _auth = FirebaseAuth.instance;
   bool _isLoading = false;
 
@@ -51,7 +50,7 @@ class LoginPageState extends State<LoginPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const SizedBox(height: 80),
+                    const SizedBox(height: 50),
                     Text('Login', style: headerStyle(level: 2)),
                     Container(
                       child: const Text(
@@ -63,49 +62,47 @@ class LoginPageState extends State<LoginPage> {
                     Container(
                       margin: EdgeInsets.symmetric(horizontal: 30),
                       child: Form(
-                          key: _formKey,
-                          child: Column(
-                            children: [
-                              InputLayout(
-                                  'Email',
-                                  TextFormField(
-                                      onChanged: (String value) => setState(() {
-                                            email = value;
-                                          }),
-                                      validator: notEmptyValidator,
-                                      decoration: customInputDecoration(
-                                          "email@email.com"))),
-                              InputLayout(
-                                  'Password',
-                                  TextFormField(
-                                      onChanged: (String value) => setState(() {
-                                            password = value;
-                                          }),
-                                      validator: notEmptyValidator,
-                                      obscureText: true,
-                                      decoration: customInputDecoration(""))),
-                              Container(
-                                margin: EdgeInsets.only(top: 20),
-                                width: double.infinity,
-                                child: FilledButton(
-                                    style: buttonStyle,
-                                    child: Text('Login',
-                                        style:
-                                            headerStyle(level: 3, dark: false)),
-                                    onPressed: () {
-                                      if (_formKey.currentState!.validate()) {
-                                        login();
-                                      }
-                                    }),
-                              )
-                            ],
-                          )),
+                        key: _formKey,
+                        child: Column(children: [
+                          InputLayout(
+                              "Email",
+                              TextFormField(
+                                  onChanged: (String value) => setState(() {
+                                        email = value;
+                                      }),
+                                  validator: notEmptyValidator,
+                                  decoration: customInputDecoration(
+                                      "example@mail.com"))),
+                          InputLayout(
+                              "Password",
+                              TextFormField(
+                                  onChanged: (String value) => setState(() {
+                                        password = value;
+                                      }),
+                                  validator: notEmptyValidator,
+                                  obscureText: true,
+                                  decoration: customInputDecoration(""))),
+                          Container(
+                            margin: EdgeInsets.only(top: 20),
+                            width: double.infinity,
+                            child: FilledButton(
+                                style: buttonStyle,
+                                child: Text("Login",
+                                    style: headerStyle(level: 3, dark: false)),
+                                onPressed: () {
+                                  if (_formKey.currentState!.validate()) {
+                                    login();
+                                  }
+                                }),
+                          )
+                        ]),
+                      ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 50),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text('Belum punya akun? '),
+                        const Text("Belum punya akun ? "),
                         InkWell(
                           onTap: () =>
                               Navigator.pushNamed(context, '/register'),
