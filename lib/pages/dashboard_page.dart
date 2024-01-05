@@ -89,7 +89,7 @@ class _DashboardFull extends State<DashboardFull> {
   Widget build(BuildContext context) {
     pages = <Widget>[
       AllLaporan(akun: akun),
-      MyLaporan(),
+      MyLaporan(akun: akun),
       Profile(akun: akun),
     ];
     return Scaffold(
