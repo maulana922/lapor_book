@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:lapor_book/models/akun.dart';
-import 'package:intl/intl.dart';
 import 'package:lapor_book/components/styles.dart';
 import 'package:lapor_book/models/laporan.dart';
 
@@ -129,7 +128,7 @@ class _ListItemState extends State<ListItem> {
                             vertical: BorderSide(width: 1))),
                     alignment: Alignment.center,
                     child: Text(
-                      "${widget.laporan.like == null ? 0 : widget.laporan.like?.length} Likes",
+                      "${widget.laporan.like == null ? 0 : widget.laporan.like?.length.toString()} Likes",
                       style: headerStyle(level: 5, dark: false),
                     ),
                   ),

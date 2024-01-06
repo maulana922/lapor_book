@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lapor_book/components/status_dialog.dart';
 import 'package:lapor_book/components/styles.dart';
@@ -8,7 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DetailPage extends StatefulWidget {
-  DetailPage({super.key});
+  const DetailPage({super.key});
 
   @override
   State<StatefulWidget> createState() => _DetailPageState();
@@ -16,6 +17,8 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
   final _firestore = FirebaseFirestore.instance;
+  final _auth = FirebaseAuth.instance;
+
   bool isShow = true;
   bool _isLoading = false;
 
@@ -43,24 +46,28 @@ class _DetailPageState extends State<DetailPage> {
       }
     });
 
-    void likePost() async {
-      CollectionReference laporanCollection = _firestore.collection('laporan');
+    void likePost(Akun akun, String docId) async {
+      setState(() {
+        _isLoading = true;
+      });
       try {
-        await laporanCollection.doc(laporan.docId).update({
-          'likes': FieldValue.arrayUnion([
-            {
-              'email': akun.email,
-              'docId': akun.nama,
-              'timestamp': DateTime.now(),
-            }
-          ])
+        CollectionReference likeCollection =
+            _firestore.collection('laporan').doc(docId).collection('like');
+
+        final liked = likeCollection.id;
+        Timestamp timestamp = Timestamp.fromDate(DateTime.now());
+
+        await likeCollection.doc(liked).set({
+          'uid': _auth.currentUser!.uid,
+          'nama': akun.nama,
+          'time': timestamp,
         });
       } catch (e) {
         final snackbar = SnackBar(content: Text(e.toString()));
         ScaffoldMessenger.of(context).showSnackBar(snackbar);
       } finally {
         setState(() {
-          isShow = !isShow;
+          _isLoading = false;
         });
       }
     }
@@ -76,7 +83,7 @@ class _DetailPageState extends State<DetailPage> {
           ? FloatingActionButton(
               backgroundColor: Colors.white,
               onPressed: () {
-                likePost();
+                likePost(akun, laporan.docId);
               },
               child: Icon(Icons.favorite))
           : null,
