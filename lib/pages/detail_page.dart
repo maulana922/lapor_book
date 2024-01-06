@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lapor_book/components/status_dialog.dart';
 import 'package:lapor_book/components/styles.dart';
@@ -14,6 +15,8 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
+  final _firestore = FirebaseFirestore.instance;
+  bool isShow = true;
   bool _isLoading = false;
 
   Future launch(String uri) async {
@@ -31,6 +34,37 @@ class _DetailPageState extends State<DetailPage> {
     Laporan laporan = arguments['laporan'];
     Akun akun = arguments['akun'];
 
+    laporan.like?.forEach((element) {
+      if (element.email == akun.email) {
+        print(element.email);
+        setState(() {
+          isShow = false;
+        });
+      }
+    });
+
+    void likePost() async {
+      CollectionReference laporanCollection = _firestore.collection('laporan');
+      try {
+        await laporanCollection.doc(laporan.docId).update({
+          'likes': FieldValue.arrayUnion([
+            {
+              'email': akun.email,
+              'docId': akun.nama,
+              'timestamp': DateTime.now(),
+            }
+          ])
+        });
+      } catch (e) {
+        final snackbar = SnackBar(content: Text(e.toString()));
+        ScaffoldMessenger.of(context).showSnackBar(snackbar);
+      } finally {
+        setState(() {
+          isShow = !isShow;
+        });
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: primaryColor,
@@ -38,6 +72,14 @@ class _DetailPageState extends State<DetailPage> {
             Text('Detail Laporan', style: headerStyle(level: 3, dark: false)),
         centerTitle: true,
       ),
+      floatingActionButton: isShow
+          ? FloatingActionButton(
+              backgroundColor: Colors.white,
+              onPressed: () {
+                likePost();
+              },
+              child: Icon(Icons.favorite))
+          : null,
       body: SafeArea(
         child: _isLoading
             ? const Center(
@@ -85,7 +127,7 @@ class _DetailPageState extends State<DetailPage> {
                         trailing: SizedBox(width: 40),
                       ),
                       ListTile(
-                        leading: Icon(Icons.date_range),
+                        leading: Icon(Icons.calendar_month),
                         title: Center(child: Text('Tanggal Laporan')),
                         subtitle: Center(
                             child: Text(DateFormat('dd MMMM yyyy')
