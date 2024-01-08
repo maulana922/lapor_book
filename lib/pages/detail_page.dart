@@ -34,15 +34,6 @@ class _DetailPageState extends State<DetailPage> {
     Laporan laporan = arguments['laporan'];
     Akun akun = arguments['akun'];
 
-    // laporan.like?.forEach((element) {
-    //   if (element.email == akun.email) {
-    //     print(element.email);
-    //     setState(() {
-    //       isShow = false;
-    //     });
-    //   }
-    // });
-
     void likePost() async {
       CollectionReference laporanCollection = _firestore.collection('laporan');
       try {
