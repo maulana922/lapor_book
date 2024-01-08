@@ -22,6 +22,7 @@ class ListItem extends StatefulWidget {
 class _ListItemState extends State<ListItem> {
   final _firestore = FirebaseFirestore.instance;
   final _storage = FirebaseStorage.instance;
+  List<Like> listLike = [];
 
   void deleteLaporan() async {
     try {
@@ -36,108 +37,139 @@ class _ListItemState extends State<ListItem> {
     }
   }
 
+  void likeStatus(Akun akun, String docId) async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> querySnapshot = await _firestore
+          .collection('laporan')
+          .doc(docId)
+          .collection('like')
+          .where('uid', isEqualTo: akun.uid)
+          .get();
+
+      setState(() {
+        listLike.clear();
+        for (var documents in querySnapshot.docs) {
+          if (documents != null) {
+            listLike.add(
+              Like(
+                uid: documents.data()['uid'],
+                docId: documents.data()['docId'],
+                nama: documents.data()['nama'],
+                timestamp: documents.data()['timestamp'].toDate(),
+              ),
+            );
+          }
+        }
+      });
+    } catch (e) {
+      // final snackbar = SnackBar(content: Text(e.toString()));
+      // ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    likeStatus(widget.akun, widget.laporan.docId);
+
     return Container(
-      decoration: BoxDecoration(
-          border: Border.all(width: 2),
-          borderRadius: BorderRadius.circular(10)),
-      child: InkWell(
-        onTap: () {
-          Navigator.pushNamed(context, '/detail', arguments: {
-            'laporan': widget.laporan,
-            'akun': widget.akun,
-          });
-        },
-        onLongPress: () {
-          if (widget.isLaporanku) {
-            showDialog(
-                context: context,
-                builder: (BuildContext) {
-                  return AlertDialog(
-                    title: Text('Delete ${widget.laporan.judul}?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Text('Batal'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          deleteLaporan();
-                        },
-                        child: Text('Hapus'),
-                      ),
-                    ],
-                  );
-                });
-          }
-        },
-        child: Column(
-          children: [
-            widget.laporan.gambar != ''
-                ? Image.network(
-                    widget.laporan.gambar!,
-                    width: 130,
-                    height: 130,
-                  )
-                : Image.asset(
-                    'assets/picture.png',
-                    width: 130,
-                    height: 130,
-                  ),
-            Container(
-              width: double.infinity,
-              alignment: Alignment.center,
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              decoration: const BoxDecoration(
-                  border: Border.symmetric(horizontal: BorderSide(width: 2))),
-              child: Text(
-                widget.laporan.judul,
-                style: headerStyle(level: 4),
-              ),
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(
-                        color: warningColor,
-                        borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(5),
+        decoration: BoxDecoration(
+            border: Border.all(width: 2),
+            borderRadius: BorderRadius.circular(10)),
+        child: InkWell(
+          onTap: () {
+            Navigator.pushNamed(context, '/detail', arguments: {
+              'laporan': widget.laporan,
+              'akun': widget.akun,
+            });
+          },
+          onLongPress: () {
+            if (widget.isLaporanku) {
+              showDialog(
+                  context: context,
+                  builder: (BuildContext) {
+                    return AlertDialog(
+                      title: Text('Delete ${widget.laporan.judul}?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text('Batal'),
                         ),
-                        border: const Border.symmetric(
-                            vertical: BorderSide(width: 1))),
-                    alignment: Alignment.center,
-                    child: Text(
-                      widget.laporan.status,
-                      style: headerStyle(level: 5, dark: false),
+                        TextButton(
+                          onPressed: () {
+                            deleteLaporan();
+                          },
+                          child: Text('Hapus'),
+                        ),
+                      ],
+                    );
+                  });
+            }
+          },
+          child: Column(
+            children: [
+              widget.laporan.gambar != ''
+                  ? Image.network(
+                      widget.laporan.gambar!,
+                      width: 130,
+                      height: 130,
+                    )
+                  : Image.asset(
+                      'assets/picture.png',
+                      width: 130,
+                      height: 130,
                     ),
-                  ),
+              Container(
+                width: double.infinity,
+                alignment: Alignment.center,
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: const BoxDecoration(
+                    border: Border.symmetric(horizontal: BorderSide(width: 2))),
+                child: Text(
+                  widget.laporan.judul,
+                  style: headerStyle(level: 4),
                 ),
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(
-                        color: primaryColor,
-                        borderRadius: const BorderRadius.only(
-                            bottomRight: Radius.circular(5)),
-                        border: const Border.symmetric(
-                            vertical: BorderSide(width: 1))),
-                    alignment: Alignment.center,
-                    child: Text(
-                      "${widget.laporan.like == null ? 0 : widget.laporan.like?.length.toString()} Likes",
-                      style: headerStyle(level: 5, dark: false),
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                          color: warningColor,
+                          borderRadius: const BorderRadius.only(
+                            bottomLeft: Radius.circular(5),
+                          ),
+                          border: const Border.symmetric(
+                              vertical: BorderSide(width: 1))),
+                      alignment: Alignment.center,
+                      child: Text(
+                        widget.laporan.status,
+                        style: headerStyle(level: 5, dark: false),
+                      ),
                     ),
                   ),
-                )
-              ],
-            )
-          ],
-        ),
-      ),
-    );
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: primaryColor,
+                          borderRadius: const BorderRadius.only(
+                              bottomRight: Radius.circular(5)),
+                          border: const Border.symmetric(
+                              vertical: BorderSide(width: 1))),
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Text(
+                        (listLike.length ?? 0).toString(),
+                        style: headerStyle(level: 5, dark: false),
+                      ),
+                    ),
+                  )
+                ],
+              )
+            ],
+          ),
+        ));
   }
 }

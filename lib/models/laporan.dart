@@ -40,13 +40,15 @@ class Komentar {
 }
 
 class Like {
-  final String email;
+  final String uid;
+  final String docId;
   final String nama;
-  final DateTime Timestamp;
+  final DateTime timestamp;
 
   Like({
-    required this.email,
+    required this.uid,
+    required this.docId,
     required this.nama,
-    required this.Timestamp,
+    required this.timestamp,
   });
 }
