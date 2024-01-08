@@ -1,7 +1,7 @@
 class Laporan {
   final String uid;
   final String docId;
-
+  final String email;
   final String judul;
   final String instansi;
   String? deskripsi;
@@ -11,11 +11,12 @@ class Laporan {
   final DateTime tanggal;
   final String maps;
   List<Komentar>? komentar;
-  List<Like>? like;
+  List like;
 
   Laporan({
     required this.uid,
     required this.docId,
+    required this.email,
     required this.judul,
     required this.instansi,
     this.deskripsi,
@@ -25,7 +26,7 @@ class Laporan {
     required this.tanggal,
     required this.maps,
     this.komentar,
-    this.like,
+    required this.like,
   });
 }
 
@@ -40,15 +41,13 @@ class Komentar {
 }
 
 class Like {
-  final String uid;
-  final String docId;
+  final String email;
   final String nama;
-  final DateTime timestamp;
+  final DateTime Timestamp;
 
   Like({
-    required this.uid,
-    required this.docId,
+    required this.email,
     required this.nama,
-    required this.timestamp,
+    required this.Timestamp,
   });
 }

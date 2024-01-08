@@ -38,6 +38,7 @@ class _AllLaporanState extends State<AllLaporan> {
             Laporan(
               uid: documents.data()['uid'],
               docId: documents.data()['docId'],
+              email: documents.data()['email'],
               judul: documents.data()['judul'],
               instansi: documents.data()['instansi'],
               deskripsi: documents.data()['deskripsi'],
@@ -47,6 +48,7 @@ class _AllLaporanState extends State<AllLaporan> {
               tanggal: documents['tanggal'].toDate(),
               maps: documents.data()['maps'],
               komentar: listKomentar,
+              like: documents.data()['likes'],
             ),
           );
         }

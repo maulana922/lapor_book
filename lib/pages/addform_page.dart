@@ -137,6 +137,7 @@ class _AddFormState extends State<AddFormPage> {
       await laporanCollection.doc(id).set({
         'uid': _auth.currentUser!.uid,
         'docId': id,
+        'email': akun.email,
         'judul': judul,
         'instansi': instansi,
         'deskripsi': deskripsi,
@@ -145,6 +146,7 @@ class _AddFormState extends State<AddFormPage> {
         'status': 'Posted', // posted, process, done
         'tanggal': timestamp,
         'maps': maps,
+        'likes': [],
       }).catchError((e) {
         throw e;
       });
