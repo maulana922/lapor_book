@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/src/widgets/framework.dart';
 
 class Laporan {
   final String uid;
@@ -35,7 +35,7 @@ class Laporan {
 class Komentar {
   final String nama;
   final String isi;
-  final String time;
+  final DateTime time;
 
   Komentar({
     required this.nama,
@@ -45,13 +45,14 @@ class Komentar {
 }
 
 class Like {
-  final String email;
-  final String nama;
-  final DateTime Timestamp;
+  final bool isLiked;
+  final DateTime waktu;
+  final String uid;
+  final String uidLaporan;
 
-  Like({
-    required this.email,
-    required this.nama,
-    required this.Timestamp,
-  });
+  Like(
+      {required this.isLiked,
+      required this.waktu,
+      required this.uid,
+      required this.uidLaporan});
 }
