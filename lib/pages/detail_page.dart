@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lapor_book/components/status_dialog.dart';
 import 'package:lapor_book/components/styles.dart';
@@ -16,6 +17,8 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
   final _firestore = FirebaseFirestore.instance;
+  final _auth = FirebaseAuth.instance;
+  final currentUser = FirebaseAuth.instance.currentUser!;
   bool isShow = true;
   bool _isLoading = false;
 
@@ -25,6 +28,9 @@ class _DetailPageState extends State<DetailPage> {
       throw Exception('tidak dapat memanggil: $uri');
     }
   }
+
+  //comment text controller
+  final _commentTextController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +60,53 @@ class _DetailPageState extends State<DetailPage> {
           isShow = !isShow;
         });
       }
+    }
+
+    //fungsi komentar
+    void commentPost(String commentText) {
+      //buat collection comment ke firestore
+      FirebaseFirestore.instance
+          .collection("laporan")
+          .doc(laporan.docId)
+          .collection("Comments")
+          .add({
+        "CommentUser": currentUser.email,
+        "CommentText": commentText,
+        "CommentTime": Timestamp.now()
+      });
+    }
+
+    //dialog komentar
+    void commentDialog() {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Tambahkan Komentar'),
+          content: TextField(
+            controller: _commentTextController,
+            decoration: InputDecoration(hintText: "Tambahkan Komentar"),
+          ),
+          actions: [
+            //kirim
+            TextButton(
+              onPressed: () {
+                commentPost(_commentTextController.text);
+                Navigator.pop(context);
+                _commentTextController.clear();
+              },
+              child: Text("Kirim"),
+            ),
+            //batal
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _commentTextController.clear();
+              },
+              child: Text("Batal"),
+            )
+          ],
+        ),
+      );
     }
 
     return Scaffold(
@@ -144,6 +197,69 @@ class _DetailPageState extends State<DetailPage> {
                         ),
                       ),
                       SizedBox(height: 30),
+
+                      //Tombol komentar
+                      Container(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            commentDialog();
+                          },
+                          style: TextButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: primaryColor,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10))),
+                          child: Text('Tambahkan Komentar'),
+                        ),
+                      ),
+                      SizedBox(height: 10),
+
+                      //Header Komentar
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Komentar',
+                            style: headerStyle(level: 3),
+                          )
+                        ],
+                      ),
+                      SizedBox(height: 20),
+
+                      //Isi Komentar
+                      StreamBuilder<QuerySnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection("laporan")
+                            .doc(laporan.docId)
+                            .collection("Comments")
+                            .orderBy("CommentTime", descending: true)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: snapshot.data!.docs.length,
+                            itemBuilder: (context, index) {
+                              //get comment
+                              final commentData = snapshot.data!.docs[index]
+                                  .data() as Map<String, dynamic>;
+                              //return comment
+                              return Komentar(
+                                nama: commentData["CommentUser"],
+                                isi: commentData["CommentText"],
+                                time: commentData["CommentTime"],
+                              );
+                            },
+                          );
+                        },
+                      ),
+
                       if (akun.role == 'admin')
                         Container(
                           width: double.infinity,

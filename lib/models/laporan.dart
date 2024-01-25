@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class Laporan {
   final String uid;
   final String docId;
@@ -10,7 +12,7 @@ class Laporan {
   final String status;
   final DateTime tanggal;
   final String maps;
-  List<Komentar>? komentar;
+  List komentar;
   List like;
 
   Laporan({
@@ -25,7 +27,7 @@ class Laporan {
     required this.status,
     required this.tanggal,
     required this.maps,
-    this.komentar,
+    required this.komentar,
     required this.like,
   });
 }
@@ -33,10 +35,12 @@ class Laporan {
 class Komentar {
   final String nama;
   final String isi;
+  final String time;
 
   Komentar({
     required this.nama,
     required this.isi,
+    required this.time,
   });
 }
 
